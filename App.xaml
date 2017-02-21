@@ -1,0 +1,9 @@
+﻿<Application x:Class="ArcGISRuntime_DotNet_LocalGeocoder.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ArcGISRuntime_DotNet_LocalGeocoder"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
