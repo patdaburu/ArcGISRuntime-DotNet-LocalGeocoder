@@ -1,6 +1,7 @@
 ﻿using ArcGISRuntime_DotNet_LocalGeocoder.Model;
 using ArcGISRuntime_DotNet_LocalGeocoder.ViewModel;
 using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Tasks.Geocoding;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -72,10 +73,18 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
             // We need the ESRI locator.
             var locatorTask = MapViewModel.Current.MobileMapPackage.LocatorTask;
 
+
+            // Apply the Workaround, Part 1...
+            ReverseGeocodeParameters rgParams = new ReverseGeocodeParameters();
+            rgParams.MaxDistance = 10;
+            rgParams.OutputSpatialReference = mapViewModel.MapView.Map.SpatialReference;
+            rgParams.MaxResults = 5;
+            rgParams.ResultAttributeNames.Add("*");
+
             // let's try a reverse geocode...
             var results = Task.Run(async () =>
             {
-                return await locatorTask.ReverseGeocodeAsync(location);
+                return await locatorTask.ReverseGeocodeAsync(location, rgParams);
             }).Result;
 
             // Examine each of the results.
@@ -86,12 +95,22 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
                  * To those who want to troubleshoot... place a breakpoint
                  * here to examine the result returned by the LocatorTask.
                  */
+                // Apply the Workaround, Part 2...
+                // (When we apply the parameters above, it seems that we get
+                // additional information in the Attributes collection.  (The
+                // "Label" property still contains an empty string.)
+                var labelAsSeenInAttributes = string.Empty;
+                if (result.Attributes.Keys.Contains("Street"))
+                {
+                    labelAsSeenInAttributes = result.Attributes["Street"] as string;
+                }
+
                 Console.WriteLine($"Label={result.Label}");
                 Console.WriteLine($"Score={result.Score}");
 
                 // Construct a label.
-                string label = string.IsNullOrWhiteSpace(result.Label) ?
-                    "The label came back as an empty string.  Why is that?" : result.Label;
+                string label = string.IsNullOrWhiteSpace(labelAsSeenInAttributes) ?
+                    "The label came back as an empty string.  Why is that?" : labelAsSeenInAttributes;
                 // Create an instance of our own GeocodeResult to hold the
                 // values from ESRI's GeocodeResult.
                 Model.GeocodeResult resultNode = new Model.GeocodeResult(result);
@@ -100,9 +119,6 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
                 mapViewModel.ReverseGeocodeResults.Add(
                     new ObjectNode($"Label={label}", resultNode));
             }
-
-
-            
 
         }
     }

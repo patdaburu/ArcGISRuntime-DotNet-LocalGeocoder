@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,12 +20,25 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Model
 
 
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeocodeResult"/> class.
+        /// </summary>
+        /// <param name="esriResult">The ESRI geocode result.</param>
         public GeocodeResult(Esri.ArcGISRuntime.Tasks.Geocoding.GeocodeResult esriResult)
         {
             this.Label = esriResult.Label;
             this.Score = esriResult.Score;
-            this.Attributes = esriResult.Attributes;
+
+            // Construct an object containing the attributes that can be
+            // used by the ObjectNode class.
+            dynamic expando = new ExpandoObject();
+            var attributes = expando as IDictionary<string, object>;
+            foreach(string key in esriResult.Attributes.Keys)
+            {
+                attributes[key] = esriResult.Attributes[key];
+            }
+            this.Attributes = expando;
+
             this.DisplayLocation = new Model.MapPoint
             {
                 X = esriResult.DisplayLocation.X,
@@ -32,8 +46,6 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Model
                 SRID = esriResult.DisplayLocation.SpatialReference.Wkid
             };
         }
-
-
 
         /// <summary>
         /// Gets or sets the label.
@@ -53,14 +65,16 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Model
         /// <seealso cref="Esri.ArcGISRuntime.Tasks.Geocoding.GeocodeResult.Score"/>
         public double Score { get; set; }
 
-        /// <summary>
-        /// Gets or sets the attributes.
-        /// </summary>
-        /// <value>
-        /// The attributes.
-        /// </value>
-        /// <seealso cref="Esri.ArcGISRuntime.Tasks.Geocoding.GeocodeResult.Attributes"/>
-        public IReadOnlyDictionary<string, object> Attributes { get; set; }
+        ///// <summary>
+        ///// Gets or sets the attributes.
+        ///// </summary>
+        ///// <value>
+        ///// The attributes.
+        ///// </value>
+        ///// <seealso cref="Esri.ArcGISRuntime.Tasks.Geocoding.GeocodeResult.Attributes"/>
+        //public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+            public ExpandoObject Attributes { get; set; }
 
         /// <summary>
         /// Gets or sets the display location.

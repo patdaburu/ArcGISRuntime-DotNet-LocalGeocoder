@@ -8,4 +8,7 @@ If you're looking for a place to put a breakpoint so that you can inspect the re
 
 If you want to inspect how the map is loaded, go to line 60 in the [LoadMapCommand.cs](Commands/LoadMapCommand.cs).
 
+## Update
+We have applied a workaround that doesn't resolve the original problem (the Label property remains blank), but allows us to get an address from the Attributes.  See [ReverseGeocodeCommand.cs](Commands/ReverseGeocodeCommand.cs), starting around line 77.
+
 
