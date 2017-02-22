@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ArcGISRuntime_DotNet_LocalGeocoder.Commands;
+using ArcGISRuntime_DotNet_LocalGeocoder.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,34 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        /// <summary>
+        /// Gets the reverse geocode command.
+        /// </summary>
+        /// <value>
+        /// The reverse geocode command.
+        /// </value>
+        private ReverseGeocodeCommand ReverseGeocodeCommand
+        {
+            get
+            {
+                return Application.Current.Resources["ReverseGeocodeCommand"]
+                   as ReverseGeocodeCommand;
+            }
+        }
+
+        private void mapView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
+        {
+            var reverseGeocodeCommand = this.ReverseGeocodeCommand;
+            if (reverseGeocodeCommand.CanExecute(MapViewModel.Current))
+            {
+                reverseGeocodeCommand.Execute(e.Location);
+            }
         }
     }
 }
