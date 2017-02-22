@@ -18,11 +18,18 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
     /// <seealso cref="System.Windows.Input.ICommand" />
     public class LoadMapCommand : ICommand
     {
-
-        
-
+        /// <summary>
+        /// Occurs when changes occur that affect whether or not the command should execute.
+        /// </summary>
         public event EventHandler CanExecuteChanged;
 
+        /// <summary>
+        /// Defines the method that determines whether the command can execute in its current state.
+        /// </summary>
+        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
+        /// <returns>
+        /// true if this command can be executed; otherwise, false.
+        /// </returns>
         public bool CanExecute(object parameter)
         {
             // This command can execute so long as we haven't yet populated
@@ -30,6 +37,10 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
             return MapViewModel.Current.MobileMapPackage == null;
         }
 
+        /// <summary>
+        /// Defines the method to be called when the command is invoked.
+        /// </summary>
+        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
         public void Execute(object parameter)
         {
             // We expect the parameter to be an ESRI MapView.
@@ -46,7 +57,12 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
                     // Load the mobile map package.
                     var mobileMapPackage = Task.Run(async () =>
                     {
-                        return await this.LoadMapAsync(ofd.FileName);
+                        /**
+                         * If you're looking for a place to put a breakpoint to
+                         * witness the loading of the Mobile Map Package, 
+                         * here's a good place to start.
+                         */
+                        return await MobileMapPackage.OpenAsync(ofd.FileName);
                     }).Result;
                     #region If there are no maps in the map package...
                     if (mobileMapPackage.Maps.Count == 0)
@@ -100,11 +116,5 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
             
         }
 
-        private async Task<MobileMapPackage> LoadMapAsync(string pathToMmpk)
-        {
-            //Create the object into which we'll load the data.
-            var mobileMapPackage = await MobileMapPackage.OpenAsync(pathToMmpk);
-            return mobileMapPackage;
-        }
     }
 }

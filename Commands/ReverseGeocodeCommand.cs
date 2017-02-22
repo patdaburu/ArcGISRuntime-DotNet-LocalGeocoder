@@ -12,12 +12,27 @@ using System.Windows.Input;
 
 namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
 {
+    /// <summary>
+    /// Performs a reverse geocode.
+    /// </summary>
+    /// <seealso cref="System.Windows.Input.ICommand" />
     public class ReverseGeocodeCommand : ICommand
     {
+        /// <summary>
+        /// Occurs when changes occur that affect whether or not the command should execute.
+        /// </summary>
         public event EventHandler CanExecuteChanged;
 
+        /// <summary>
+        /// Defines the method that determines whether the command can execute in its current state.
+        /// </summary>
+        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
+        /// <returns>
+        /// true if this command can be executed; otherwise, false.
+        /// </returns>
         public bool CanExecute(object parameter)
         {
+            // We can execute so long as there's a mobile map package loaded.
             var mainViewModel = parameter as MapViewModel;
             if(mainViewModel == null)
             {
@@ -29,6 +44,10 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
             }
         }
 
+        /// <summary>
+        /// Defines the method to be called when the command is invoked.
+        /// </summary>
+        /// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
         public void Execute(object parameter)
         {
             // The parameter should be an ESRI MapPoint.
@@ -44,6 +63,7 @@ namespace ArcGISRuntime_DotNet_LocalGeocoder.Commands
             }
             #endregion
 
+            // We'll need access to the map view model.
             var mapViewModel = MapViewModel.Current;
 
             // Clear the list of reverse geocodes.
